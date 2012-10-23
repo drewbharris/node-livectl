@@ -1,4 +1,4 @@
-# node-multi
+# node-livectl
 
 Peer-to-peer MIDI messaging over socket.io.
 
