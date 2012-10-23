@@ -25,6 +25,21 @@ if (commander.start) {
 	console.log('starting server');
 
 	server.listen(8080);
+
+	io.sockets.on('connection', function(socket){
+		socket.on('midiEvent', function(data){
+			socket.broadcast.emit('midiEvent', data);
+		});
+	});
+
+	// client route
+	app.get('/', function (req, res) {
+		var ua = req.header('user-agent');
+		if (/mobile/i.test(ua)) {
+		return res.sendfile(__dirname + '/slave_mobile.html');
+		}
+		return res.sendfile(__dirname + '/slave.html');
+	});
 }
 else if (typeof commander.connect === 'string') {
 	var app = require('express')(),
@@ -71,20 +86,38 @@ else if (typeof commander.connect === 'string') {
 			// console.log('opening virtual midi output ' + nickname + '-output');
 			// midiInput.openVirtualPort(nickname + '-output');
 		}
-		if (!input && !output) {
+		if (input === undefined && output === undefined) {
 			console.log('need to select an input or output');
 			process.exit(0);
 		}
+		next();
 	}).then(function(next){
 		console.log('connecting to ' + commander.connect);
 
 		var socket = io.connect(commander.connect);
 		socket.on('midiEvent', function(data){
 			console.log(data);
+			if (output !== undefined) {
+				midiOutput.sendMessage(data.midiMessage);
+			}
 		});
-		midiInput.close();
-		midiOutput.close();
+
+		midiInput.on('message', function(deltaTime, message){
+			console.log(message, ' ', deltaTime);
+			if (input !== undefined) {
+				socket.emit('midiEvent', {
+					'midiMessage': message,
+					'deltaTime': deltaTime,
+					'client': nickname
+				});
+			}
+		});
+
+
 	});
+
+	// midiInput.close();
+	// midiOutput.close();
 
 }
 else if (commander.list) {
