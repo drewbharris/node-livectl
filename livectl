@@ -3,11 +3,11 @@
 "use strict";
 
 var fs = require('fs'),
-    when = require('when'),
-    sequence = require('sequence'),
-    commander = require('commander'),
-    midi = require('midi'),
-    globalSockets = {};
+	when = require('when'),
+	sequence = require('sequence'),
+	commander = require('commander'),
+	midi = require('midi'),
+	globalSockets = {};
 
 commander
 	.version('0.0.1')
@@ -18,61 +18,78 @@ commander
 
 if (commander.start) {
 	var app = require('express')(),
-	    express = require('express'),
-	    server = require('http').createServer(app),
-	    io = require('socket.io').listen(server);
-	    
+		express = require('express'),
+		server = require('http').createServer(app),
+		io = require('socket.io').listen(server);
+
 	console.log('starting server');
 
 	server.listen(8080);
 }
 else if (typeof commander.connect === 'string') {
-    var app = require('express')(),
-	    express = require('express'),
-	    server = require('http').createServer(app),
-	    io = require('socket.io-client'),
-	    input = new midi.input(),
-    	output = new midi.output(),
-    	inputChoice,
-    	outputChoice;
+	var app = require('express')(),
+		express = require('express'),
+		server = require('http').createServer(app),
+		io = require('socket.io-client'),
+		midiInput = new midi.input(),
+		midiOutput = new midi.output(),
+		nickname,
+		input,
+		output;
 
-	sequence(this).then(function(next){
-		listPorts(input, output).then(next);
+	sequence().then(function(next){
+		listPorts(midiInput, midiOutput).then(next);
 	}).then(function(next){
 		commander.prompt('enter a name for this computer: ', next);
 	}).then(function(next, nicknameChoice){
+		nickname = nicknameChoice;
 		next();
 	}).then(function(next){
 		commander.prompt('input (enter for none): ', next);
 	}).then(function(next, inputChoice){
-		this.inputChoice = inputChoice;
+		input = inputChoice;
 		next();
 	}).then(function(next){
 		commander.prompt('output (enter for none): ', next);
 	}).then(function(next, outputChoice){
-		this.outputChoice = outputChoice;
+		output = outputChoice;
 		next();
 	}).then(function(next){
-		if (!this.inputChoice
-			&& !this.outputChoice) {
-			console.log('either an input or output is required');
+		if (input) {
+			console.log('opening midi input ' + input);
+			midiInput.openPort(parseInt(input, 10));
+		}
+		else {
+			// console.log('opening virtual midi input ' + nickname + '-input');
+			// midiInput.openVirtualPort(nickname + '-input');
+		}
+		if (output) {
+			console.log('opening midi output ' + output);
+			midiOutput.openPort(parseInt(output, 10));
+		}
+		else {
+			// console.log('opening virtual midi output ' + nickname + '-output');
+			// midiInput.openVirtualPort(nickname + '-output');
+		}
+		if (!input && !output) {
+			console.log('need to select an input or output');
 			process.exit(0);
 		}
+	}).then(function(next){
 		console.log('connecting to ' + commander.connect);
 
 		var socket = io.connect(commander.connect);
 		socket.on('midiEvent', function(data){
 			console.log(data);
 		});
-
-		// process.exit(0);
+		midiInput.close();
+		midiOutput.close();
 	});
 
-	
 }
 else if (commander.list) {
-    listPorts(new midi.input(), new midi.output());
-    process.exit(0);
+	listPorts(new midi.input(), new midi.output());
+	process.exit(0);
 }
 else {
 	commander.outputHelp();
@@ -81,16 +98,16 @@ else {
 function listPorts(input, output) {
 	var d = when.defer(),
 		numberOfInputs = input.getPortCount(),
-    	numberOfOutputs = output.getPortCount();
+		numberOfOutputs = output.getPortCount();
 	console.log('Inputs:');
-    for (var i=0;i<numberOfInputs;i++) {
-    	console.log(i + ': ' + input.getPortName(i));
-    }
-    console.log('Outputs:');
-    for (var i=0;i<numberOfOutputs;i++) {
-    	console.log(i + ': ' + output.getPortName(i));
-    }
-    d.resolve();
-    return d.promise;
+	for (var i=0;i<numberOfInputs;i++) {
+		console.log(i + ': ' + input.getPortName(i));
+	}
+	console.log('Outputs:');
+	for (i=0;i<numberOfOutputs;i++) {
+		console.log(i + ': ' + output.getPortName(i));
+	}
+	d.resolve();
+	return d.promise;
 }
 
