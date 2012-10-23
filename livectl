@@ -21,6 +21,7 @@ if (commander.start) {
 	    express = require('express'),
 	    server = require('http').createServer(app),
 	    io = require('socket.io').listen(server);
+	    
 	console.log('starting server');
 
 	server.listen(8080);
@@ -29,33 +30,42 @@ else if (typeof commander.connect === 'string') {
     var app = require('express')(),
 	    express = require('express'),
 	    server = require('http').createServer(app),
-	    io = require('socket.io').listen(server),
+	    io = require('socket.io-client'),
 	    input = new midi.input(),
-    	output = new midi.output();
+    	output = new midi.output(),
+    	inputChoice,
+    	outputChoice;
 
 	sequence(this).then(function(next){
 		listPorts(input, output).then(next);
 	}).then(function(next){
+		commander.prompt('enter a name for this computer: ', next);
+	}).then(function(next, nicknameChoice){
+		next();
+	}).then(function(next){
 		commander.prompt('input (enter for none): ', next);
 	}).then(function(next, inputChoice){
-		console.log(inputChoice);
+		this.inputChoice = inputChoice;
 		next();
 	}).then(function(next){
 		commander.prompt('output (enter for none): ', next);
 	}).then(function(next, outputChoice){
-		console.log(outputChoice);
+		this.outputChoice = outputChoice;
 		next();
 	}).then(function(next){
+		if (!this.inputChoice
+			&& !this.outputChoice) {
+			console.log('either an input or output is required');
+			process.exit(0);
+		}
 		console.log('connecting to ' + commander.connect);
-		server.listen(8080);
-		// var socket = io.connect(commander.connect);
-		// socket.on('midiEvent', function(data){
-		// 	console.log(data);
-		// });
 
-		// input.closePort();
-	 //    output.closePort();
-		process.exit(0);
+		var socket = io.connect(commander.connect);
+		socket.on('midiEvent', function(data){
+			console.log(data);
+		});
+
+		// process.exit(0);
 	});
 
 	
