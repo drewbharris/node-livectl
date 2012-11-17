@@ -1,9 +1,9 @@
 "use strict";
 
 var app = module.exports = require('appjs'),
-    live = require('./lib/livectl').create(),
+    Server = require('./lib/server'),
+    Client = require('./lib/client'),
     when = require('when');
-
 
 app.serveFilesFrom(__dirname + '/lib/appjs/content');
 
@@ -41,40 +41,42 @@ window.on('close', function(){
 
 window.on('ready', function(){
 
-    var $ = window.$;
+    // appjs init stuff
+
+    var $ = window.$,
+        client = Client.create($),
+        server = Server.create($);
 
     window.frame.show();
     window.frame.center();
     window.frame.setMenuBar(menubar);
-
-    console.log("Window Ready");
     window.process = process;
     window.module = module;
-
-    $('#messages').text('hello');
-
-    $('#list').click(function(){
-        $('#midiDeviceList').text(JSON.stringify(live.listPorts()));
-    });
-
-    $('#startServer').click(function(){
-        $('#messages').text('starting server');
-        live.startServer();
-    });
-
-    $('#startClient').click(function(){
-        $('#messages').text('starting client');
-        live.startClient();
-    });
-
     function Escape(e){
         return e.keyCode === 27;
     }
-
     window.addEventListener('keydown', function(e){
         if (new Escape(e)) {
             window.frame.destroy();
         }
     });
-});
 
+    // real stuff
+
+    $('#messages').text('hello');
+
+    // $('#list').click(function(){
+    //     $('#midiDeviceList').text(JSON.stringify(live.listPorts()));
+    // });
+
+    $('#startServer').click(function(){
+        $('#messages').text('starting server');
+        server.begin();
+    });
+
+    $('#startClient').click(function(){
+        $('#messages').text('starting client');
+        client.begin();
+    });
+
+});
