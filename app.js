@@ -97,18 +97,3 @@ window.on('close', function(){
   console.log("Window Closed");
 });
 
-function listPorts(input, output) {
-  var d = when.defer(),
-    numberOfInputs = input.getPortCount(),
-    numberOfOutputs = output.getPortCount();
-  console.log('Inputs:');
-  for (var i=0;i<numberOfInputs;i++) {
-    console.log(i + ': ' + input.getPortName(i));
-  }
-  console.log('Outputs:');
-  for (i=0;i<numberOfOutputs;i++) {
-    console.log(i + ': ' + output.getPortName(i));
-  }
-  d.resolve();
-  return d.promise;
-}
