@@ -10,6 +10,12 @@
     "midi": "0.6.0",
     "socket.io": "0.9.10",
     "socket.io-client": "0.9.10",
-    "commander": "1.0.5"
+    "commander": "1.0.5",
+    "mime": "1.2.5",
+    "appjs-darwin": "0.0.19",
+    "appjs": "0.0.20"
+  },
+  "scripts": {
+    "start": "./app.sh"
   }
 }
