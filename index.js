@@ -25,29 +25,6 @@ var menubar = app.createMenu([{
     }]
 }]);
 
-var trayMenu = app.createMenu([{
-    label:'Show',
-        action:function(){
-        window.frame.show();
-    }
-},{
-    label:'Minimize',
-    action:function(){
-        window.frame.hide();
-    }
-},{
-    label:'Exit',
-    action:function(){
-        window.close();
-    }
-}]);
-
-var statusIcon = app.createStatusIcon({
-    icon: __dirname + '/lib/appjs/content/icons/32.png',
-    tooltip: 'AppJS Hello World',
-    menu: trayMenu
-});
-
 var window = app.createWindow({
     width  : 800,
     height : 600,
@@ -74,8 +51,20 @@ window.on('ready', function(){
     window.process = process;
     window.module = module;
 
-    $('#connect').click(function(){
+    $('#messages').text('hello');
+
+    $('#list').click(function(){
         $('#midiDeviceList').text(JSON.stringify(live.listPorts()));
+    });
+
+    $('#startServer').click(function(){
+        $('#messages').text('starting server');
+        live.startServer();
+    });
+
+    $('#startClient').click(function(){
+        $('#messages').text('starting client');
+        live.startClient();
     });
 
     function Escape(e){

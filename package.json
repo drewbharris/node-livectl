@@ -14,5 +14,8 @@
     "mime": "1.2.5",
     "appjs-darwin": "0.0.19",
     "appjs": "0.0.20"
+  },
+  "scripts": {
+    "start": "./app.sh"
   }
 }

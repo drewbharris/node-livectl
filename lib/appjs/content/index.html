@@ -1,16 +1,20 @@
 <!doctype html>
 <html>
   <head>
-    <title>Hello World!</title>
+    <title>livectl</title>
     <link rel="stylesheet" href="style.css">
   </head>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
   <script type="text/javascript">
 
   </script>
   <body>
+    <div id="messages"></div>
     <h1>List of MIDI devices:</h1>
     <div id="midiDeviceList"></div>
-    <input type="button" id="connect" value="connect" />
+    <input type="button" id="list" value="list" /><br/>
+    <input type="button" id="startServer" value="start server" />
+    <input type="button" id="startClient" value="start client" />
+
   </body>
 </html>
