@@ -3,6 +3,7 @@
 var app = module.exports = require('appjs'),
     Server = require('./lib/server'),
     Client = require('./lib/client'),
+    server, client,
     when = require('when');
 
 app.serveFilesFrom(__dirname + '/lib/appjs/content');
@@ -36,16 +37,16 @@ window.on('create', function(){
 });
 
 window.on('close', function(){
-    console.log('close');
+    if (server !== undefined){
+        server.stop();
+    }
 });
 
 window.on('ready', function(){
 
     // appjs init stuff
 
-    var $ = window.$,
-        client = Client.create($),
-        server = Server.create($);
+    var $ = window.$;
 
     window.frame.show();
     window.frame.center();
@@ -71,11 +72,13 @@ window.on('ready', function(){
 
     $('#startServer').click(function(){
         $('#messages').text('starting server');
+        server = Server.create($);
         server.begin();
     });
 
     $('#startClient').click(function(){
         $('#messages').text('starting client');
+        client = Client.create($);
         client.begin();
     });
 
