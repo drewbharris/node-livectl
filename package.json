@@ -1,6 +1,6 @@
 {
   "name": "livectl",
-  "description": "Node.js app to read events from an Arduino and send them as MIDI events over socket.io.",
+  "description": "Node.js + AppJS + mDNS + UDP + MIDI",
   "version": "0.0.1",
   "author": "Drew Harris",
   "dependencies": {
@@ -17,5 +17,8 @@
   },
   "scripts": {
     "start": "./app.sh"
+  },
+  "config": {
+    "arch": "ia32"
   }
 }

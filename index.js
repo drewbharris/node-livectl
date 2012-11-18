@@ -40,6 +40,12 @@ window.on('close', function(){
     if (server !== undefined){
         server.stop();
     }
+    if (client !== undefined){
+        console.log('disconnecting...');
+        client.disconnect().then(function(){
+            return;
+        });
+    }
 });
 
 window.on('ready', function(){
